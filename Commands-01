@@ -1,0 +1,98 @@
+[oracle@localhost ~]$ ll
+total 0
+drwxr-xr-x. 2 oracle oinstall 6 Jul 27 13:33 Desktop
+drwxr-xr-x. 2 oracle oinstall 6 Jul 27 13:33 Documents
+drwxr-xr-x. 2 oracle oinstall 6 Jul 27 13:33 Downloads
+drwxr-xr-x. 2 oracle oinstall 6 Jul 27 13:33 Music
+drwxr-xr-x. 2 oracle oinstall 6 Jul 27 13:33 Pictures
+drwxr-xr-x. 2 oracle oinstall 6 Jul 27 13:33 Public
+drwxr-xr-x. 2 oracle oinstall 6 Jul 27 13:33 Templates
+drwxr-xr-x. 2 oracle oinstall 6 Jul 27 13:33 Videos
+[oracle@localhost ~]$ cd..
+bash: cd..: command not found...
+[oracle@localhost ~]$ cd ..
+[oracle@localhost home]$ ll
+total 8
+drwx------. 16 akkash akkash   4096 Jul 27 12:26 akkash
+drwx------. 19 oracle oinstall 4096 Jul 27 16:15 oracle
+[oracle@localhost home]$  pwd
+/home
+[oracle@localhost home]$ cd 
+[oracle@localhost ~]$ ls
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+[oracle@localhost ~]$ cat /etc/oratab  
+#
+# This file is used by ORACLE utilities.  It is created by root.sh
+# and updated by either Database Configuration Assistant while creating
+# a database or ASM Configuration Assistant while creating ASM instance.
+
+# A colon, ':', is used as the field terminator.  A new line terminates
+# the entry.  Lines beginning with a pound sign, '#', are comments.
+#
+# Entries are of the form:
+#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:
+#
+# The first and second fields are the system identifier and home
+# directory of the database respectively.  The third field indicates
+# to the dbstart utility that the database should , "Y", or should not,
+# "N", be brought up at system boot time.
+#
+# Multiple entries with the same $ORACLE_SID are not allowed.
+#
+#
+prod:/u01/app/oracle/product/19.0.0/dbhome_1:N
+[oracle@localhost ~]$ pwd
+/home/oracle
+ [oracle@localhost ~]$ ps -ef | grep pmon 
+oracle    5383  3780  0 16:37 pts/0    00:00:00 grep --color=auto pmon
+ [oracle@localhost ~]$ . oraenv 
+ORACLE_SID = [oracle] ? prod
+The Oracle base has been set to /u01/app/oracle
+[oracle@localhost ~]$ sqlplus 
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Jul 27 16:39:06 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Enter user-name: sys as sysdba
+Enter password: 
+Connected to an idle instance.
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1493168352 bytes
+Fixed Size		    8896736 bytes
+Variable Size		  889192448 bytes
+Database Buffers	  587202560 bytes
+Redo Buffers		    7876608 bytes
+Database mounted.
+Database opened.
+SQL> select name, open_mode from v$database;
+
+NAME	  OPEN_MODE
+--------- --------------------
+PROD	  READ WRITE
+SQL> select name from v$datafile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PROD/system01.dbf
+/u01/app/oracle/oradata/PROD/sysaux01.dbf
+/u01/app/oracle/oradata/PROD/undotbs01.dbf
+/u01/app/oracle/oradata/PROD/users01.dbf
+
+SQL> select name from v$controlfile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PROD/control01.ctl
+/u01/app/oracle/fast_recovery_area/PROD/control02.ctl
+
+SQL> select member from v$logfile;
+
+MEMBER
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PROD/redo03.log
+/u01/app/oracle/oradata/PROD/redo02.log
+/u01/app/oracle/oradata/PROD/redo01.log
