@@ -1,0 +1,301 @@
+Tablespace Practical
+[oracle@localhost ~]$ . oraenv
+ORACLE_SID = [oracle] ? prod
+The Oracle base has been set to /u01/app/oracle
+[oracle@localhost ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Aug 12 15:09:58 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1493168352 bytes
+Fixed Size		    8896736 bytes
+Variable Size		  889192448 bytes
+Database Buffers	  587202560 bytes
+Redo Buffers		    7876608 bytes
+Database mounted.
+Database opened.
+SQL> desc v$tablespace;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ TS#						    NUMBER
+ NAME						    VARCHAR2(30)
+ INCLUDED_IN_DATABASE_BACKUP			    VARCHAR2(3)
+ BIGFILE					    VARCHAR2(3)
+ FLASHBACK_ON					    VARCHAR2(3)
+ ENCRYPT_IN_BACKUP				    VARCHAR2(3)
+ CON_ID 					    NUMBER
+
+SQL> desc dba_tablespaces;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ TABLESPACE_NAME			   NOT NULL VARCHAR2(30)
+ BLOCK_SIZE				   NOT NULL NUMBER
+ INITIAL_EXTENT 				    NUMBER
+ NEXT_EXTENT					    NUMBER
+ MIN_EXTENTS				   NOT NULL NUMBER
+ MAX_EXTENTS					    NUMBER
+ MAX_SIZE					    NUMBER
+ PCT_INCREASE					    NUMBER
+ MIN_EXTLEN					    NUMBER
+ STATUS 					    VARCHAR2(9)
+ CONTENTS					    VARCHAR2(21)
+ LOGGING					    VARCHAR2(9)
+ FORCE_LOGGING					    VARCHAR2(3)
+ EXTENT_MANAGEMENT				    VARCHAR2(10)
+ ALLOCATION_TYPE				    VARCHAR2(9)
+ PLUGGED_IN					    VARCHAR2(3)
+ SEGMENT_SPACE_MANAGEMENT			    VARCHAR2(6)
+ DEF_TAB_COMPRESSION				    VARCHAR2(8)
+ RETENTION					    VARCHAR2(11)
+ BIGFILE					    VARCHAR2(3)
+ PREDICATE_EVALUATION				    VARCHAR2(7)
+ ENCRYPTED					    VARCHAR2(3)
+ COMPRESS_FOR					    VARCHAR2(30)
+ DEF_INMEMORY					    VARCHAR2(8)
+ DEF_INMEMORY_PRIORITY				    VARCHAR2(8)
+ DEF_INMEMORY_DISTRIBUTE			    VARCHAR2(15)
+ DEF_INMEMORY_COMPRESSION			    VARCHAR2(17)
+ DEF_INMEMORY_DUPLICATE 			    VARCHAR2(13)
+ SHARED 					    VARCHAR2(13)
+ DEF_INDEX_COMPRESSION				    VARCHAR2(8)
+ INDEX_COMPRESS_FOR				    VARCHAR2(13)
+ DEF_CELLMEMORY 				    VARCHAR2(14)
+ DEF_INMEMORY_SERVICE				    VARCHAR2(12)
+ DEF_INMEMORY_SERVICE_NAME			    VARCHAR2(1000)
+ LOST_WRITE_PROTECT				    VARCHAR2(7)
+ CHUNK_TABLESPACE				    VARCHAR2(1)
+
+SQL> select TABLESPACE_NAME,BLOCK_SIZE,STATUS,CONTENTS from dba_tablespace;
+select TABLESPACE_NAME,BLOCK_SIZE,STATUS,CONTENTS from dba_tablespace
+                                                       *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> select TABLESPACE_NAME,BLOCK_SIZE,STATUS,CONTENTS from dba_tablespaces;
+
+TABLESPACE_NAME 	       BLOCK_SIZE STATUS    CONTENTS
+------------------------------ ---------- --------- ---------------------
+SYSTEM				     8192 ONLINE    PERMANENT
+SYSAUX				     8192 ONLINE    PERMANENT
+UNDOTBS1			     8192 ONLINE    UNDO
+TEMP				     8192 ONLINE    TEMPORARY
+USERS				     8192 ONLINE    PERMANENT
+
+SQL> create tablespace mytbs
+  2  datafile '/u01/app/oracle/mydf01.dbf'
+  3  size 10m       
+  4  extent management local;
+
+Tablespace created.
+
+SQL> select TABLESPACE_NAME,BLOCK_SIZE,STATUS,CONTENTS,EXTENT_MANAGEMENT from dba_tablespaces;
+
+TABLESPACE_NAME 	       BLOCK_SIZE STATUS    CONTENTS
+------------------------------ ---------- --------- ---------------------
+EXTENT_MAN
+----------
+SYSTEM				     8192 ONLINE    PERMANENT
+LOCAL
+
+SYSAUX				     8192 ONLINE    PERMANENT
+LOCAL
+
+UNDOTBS1			     8192 ONLINE    UNDO
+LOCAL
+
+
+TABLESPACE_NAME 	       BLOCK_SIZE STATUS    CONTENTS
+------------------------------ ---------- --------- ---------------------
+EXTENT_MAN
+----------
+TEMP				     8192 ONLINE    TEMPORARY
+LOCAL
+
+USERS				     8192 ONLINE    PERMANENT
+LOCAL
+
+MYTBS				     8192 ONLINE    PERMANENT
+LOCAL
+
+
+6 rows selected.
+
+SQL> set line 100
+SQL> select TABLESPACE_NAME,BLOCK_SIZE,STATUS,CONTENTS,EXTENT_MANAGEMENT from dba_tablespaces;
+
+TABLESPACE_NAME 	       BLOCK_SIZE STATUS    CONTENTS		  EXTENT_MAN
+------------------------------ ---------- --------- --------------------- ----------
+SYSTEM				     8192 ONLINE    PERMANENT		  LOCAL
+SYSAUX				     8192 ONLINE    PERMANENT		  LOCAL
+UNDOTBS1			     8192 ONLINE    UNDO		  LOCAL
+TEMP				     8192 ONLINE    TEMPORARY		  LOCAL
+USERS				     8192 ONLINE    PERMANENT		  LOCAL
+MYTBS				     8192 ONLINE    PERMANENT		  LOCAL
+
+6 rows selected.
+
+SQL> desc dba_data_files;
+ Name						       Null?	Type
+ ----------------------------------------------------- -------- ------------------------------------
+ FILE_NAME							VARCHAR2(513)
+ FILE_ID							NUMBER
+ TABLESPACE_NAME						VARCHAR2(30)
+ BYTES								NUMBER
+ BLOCKS 							NUMBER
+ STATUS 							VARCHAR2(9)
+ RELATIVE_FNO							NUMBER
+ AUTOEXTENSIBLE 						VARCHAR2(3)
+ MAXBYTES							NUMBER
+ MAXBLOCKS							NUMBER
+ INCREMENT_BY							NUMBER
+ USER_BYTES							NUMBER
+ USER_BLOCKS							NUMBER
+ ONLINE_STATUS							VARCHAR2(7)
+ LOST_WRITE_PROTECT						VARCHAR2(7)
+
+SQL> select FILE_NAME,TABLESPACE_NAME,STATUS,BLOCKS from dba_data_files where tablespace_name='MYTBS';	
+
+FILE_NAME
+----------------------------------------------------------------------------------------------------
+TABLESPACE_NAME 	       STATUS	     BLOCKS
+------------------------------ --------- ----------
+/u01/app/oracle/mydf01.dbf
+MYTBS			       AVAILABLE       1280
+
+
+SQL> set line 100
+SQL> select FILE_NAME,TABLESPACE_NAME,STATUS,BLOCKS from dba_data_files where tablespace_name='MYTBS';	
+
+FILE_NAME
+----------------------------------------------------------------------------------------------------
+TABLESPACE_NAME 	       STATUS	     BLOCKS
+------------------------------ --------- ----------
+/u01/app/oracle/mydf01.dbf
+MYTBS			       AVAILABLE       1280
+
+
+SQL> col FILE_NAME for a20
+SQL> select FILE_NAME,TABLESPACE_NAME,STATUS,BLOCKS from dba_data_files where tablespace_name='MYTBS';
+
+FILE_NAME	     TABLESPACE_NAME		    STATUS	  BLOCKS
+-------------------- ------------------------------ --------- ----------
+/u01/app/oracle/mydf MYTBS			    AVAILABLE	    1280
+01.dbf
+
+
+SQL> col FILE_NAME for a20
+SQL> col FILE_NAME for a40
+SQL> select FILE_NAME,TABLESPACE_NAME,STATUS,BLOCKS from dba_data_files where tablespace_name='MYTBS';
+
+FILE_NAME				 TABLESPACE_NAME		STATUS	      BLOCKS
+---------------------------------------- ------------------------------ --------- ----------
+/u01/app/oracle/mydf01.dbf		 MYTBS				AVAILABLE	1280
+
+SQL> select name from v$datafile;
+
+NAME
+----------------------------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PROD/system01.dbf
+/u01/app/oracle/oradata/PROD/sysaux01.dbf
+/u01/app/oracle/oradata/PROD/undotbs01.dbf
+/u01/app/oracle/mydf01.dbf
+/u01/app/oracle/oradata/PROD/users01.dbf
+
+SQL> select allocation_type,extent_management,contents from dba_tablespaces where tablespace_name='MYTBS';
+
+ALLOCATIO EXTENT_MAN CONTENTS
+--------- ---------- ---------------------
+SYSTEM	  LOCAL      PERMANENT
+
+SQL> select file_name, sum(bytes),autoextensible, sum(maxbytes) from dba_data_files where tablespace_name='MYTBS' group by file_name, autoextensible;
+
+FILE_NAME				 SUM(BYTES) AUT SUM(MAXBYTES)
+---------------------------------------- ---------- --- -------------
+/u01/app/oracle/mydf01.dbf		   10485760 NO		    0
+
+SQL> select sum(bytes/1024/1024/1024) from dba_data_files;
+
+SUM(BYTES/1024/1024/1024)
+-------------------------
+	       1.77246094
+
+SQL> alter database datafile '/u01/app/oracle/mydf01.dbf' autoextend on;
+
+Database altered.
+
+SQL> desc dba_data_files;
+ Name						       Null?	Type
+ ----------------------------------------------------- -------- ------------------------------------
+ FILE_NAME							VARCHAR2(513)
+ FILE_ID							NUMBER
+ TABLESPACE_NAME						VARCHAR2(30)
+ BYTES								NUMBER
+ BLOCKS 							NUMBER
+ STATUS 							VARCHAR2(9)
+ RELATIVE_FNO							NUMBER
+ AUTOEXTENSIBLE 						VARCHAR2(3)
+ MAXBYTES							NUMBER
+ MAXBLOCKS							NUMBER
+ INCREMENT_BY							NUMBER
+ USER_BYTES							NUMBER
+ USER_BLOCKS							NUMBER
+ ONLINE_STATUS							VARCHAR2(7)
+ LOST_WRITE_PROTECT						VARCHAR2(7)
+
+SQL> select FILE_NAME,TABLESPACE_NAME,AUTOEXTENSIBLE from dba_data_files where tablespace_name='MYTBS';
+
+FILE_NAME				 TABLESPACE_NAME		AUT
+---------------------------------------- ------------------------------ ---
+/u01/app/oracle/mydf01.dbf		 MYTBS				YES
+
+SQL> alter database datafile '/u01/app/oracle/mydf01.dbf' resize 5m;
+
+Database altered.
+
+SQL> select FILE_NAME,TABLESPACE_NAME,BYTES from dba_data_files where tablespace_name='MYTBS';
+
+FILE_NAME				 TABLESPACE_NAME		     BYTES
+---------------------------------------- ------------------------------ ----------
+/u01/app/oracle/mydf01.dbf		 MYTBS				   5242880
+
+SQL> alter tablespace MYTBS add datafile '/u01/app/oracle/newdf.dbf'
+  2  size 8m
+  3  autoextend on;
+
+Tablespace altered.
+
+SQL> select FILE_NAME,TABLESPACE_NAME,BYTES from dba_data_files where tablespace_name='MYTBS';
+
+FILE_NAME				 TABLESPACE_NAME		     BYTES
+---------------------------------------- ------------------------------ ----------
+/u01/app/oracle/mydf01.dbf		 MYTBS				   5242880
+/u01/app/oracle/newdf.dbf		 MYTBS				   8388608
+
+SQL> alter tablespace mytbs rename to mydata;
+
+Tablespace altered.
+
+
+
+SQL> select name from v$TABLESPACE;
+
+NAME
+------------------------------
+SYSAUX
+SYSTEM
+UNDOTBS1
+USERS
+TEMP
+MYDATA
+
+6 rows selected.
+
+SQL>
