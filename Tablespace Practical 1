@@ -1,5 +1,5 @@
 Tablespace Practical
-[oracle@localhost ~]$ . oraenv
+[oracle@localhost ~]$ . oraenv 
 ORACLE_SID = [oracle] ? prod
 The Oracle base has been set to /u01/app/oracle
 [oracle@localhost ~]$ sqlplus / as sysdba
